@@ -9,7 +9,7 @@ A one-command recon tool using **built-in Kali Linux tools** (no installations n
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/YOUR_USERNAME/kali-auto-recon.git
+git clone https://github.com/Sakar20-coder/kali-auto-recon.git
 cd kali-auto-recon
 
 ./recon.sh
