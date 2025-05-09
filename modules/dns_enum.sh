@@ -9,37 +9,43 @@ NC='\033[0m'
 # Auto-create dirs
 mkdir -p results/reports/dns
 
-# Check if tools exist
-command -v host >/dev/null 2>&1 || { echo -e "${RED}[!] 'host' command not found. Install bind-utils/dnsutils.${NC}"; exit 1; }
-command -v dnsrecon >/dev/null 2>&1 || { echo -e "${RED}[!] dnsrecon not found. Install with 'sudo apt install dnsrecon'.${NC}"; exit 1; }
+# Check tools
+command -v host >/dev/null 2>&1 || { echo -e "${RED}[!] 'host' command missing. Install with: sudo apt install dnsutils${NC}"; exit 1; }
+command -v dnsrecon >/dev/null 2>&1 || { echo -e "${RED}[!] dnsrecon missing. Install with: sudo apt install dnsrecon${NC}"; exit 1; }
 
 # Get target
-echo -e "${YELLOW}[*] Starting DNS Enumeration${NC}"
+clear
+echo -e "${YELLOW}[*] DNS ENUMERATION MODE${NC}"
 echo -n "Enter domain (e.g., example.com): "
 read domain
 
 # Validate input
 if [[ -z "$domain" ]]; then
   echo -e "${RED}[!] No domain specified${NC}"
+  sleep 2
   exit 1
 fi
 
-# Run tools
-echo -e "\n${GREEN}[1] Running host...${NC}"
+# Run scans
+echo -e "\n${GREEN}[1] Running host lookups...${NC}"
 host -t any "$domain" > "results/reports/dns/host_$domain.txt"
+cat "results/reports/dns/host_$domain.txt"
 
 echo -e "\n${GREEN}[2] Running dnsrecon...${NC}"
-dnsrecon -d "$domain" -t std > "results/reports/dns/dnsrecon_$domain.txt"
+dnsrecon -d "$domain" -t std >> "results/reports/dns/dnsrecon_$domain.txt"
+tail -n 10 "results/reports/dns/dnsrecon_$domain.txt"
 
 echo -e "\n${GREEN}[3] Checking WHOIS...${NC}"
 whois "$domain" >> "results/reports/dns/whois_$domain.txt"
+head -n 10 "results/reports/dns/whois_$domain.txt"
 
-# Verify output
-if [[ -s "results/reports/dns/host_$domain.txt" ]]; then
-  echo -e "\n${YELLOW}[+] Results saved to:${NC}"
-  echo -e "- Host records: results/reports/dns/host_$domain.txt"
-  echo -e "- DNS recon: results/reports/dns/dnsrecon_$domain.txt"
-  echo -e "- WHOIS: results/reports/dns/whois_$domain.txt"
-else
-  echo -e "${RED}[!] No DNS records found for $domain${NC}"
-fi
+# Show summary
+echo -e "\n${YELLOW}=== SCAN COMPLETE ==="
+echo -e "Results saved to:${NC}"
+echo -e "- Host records: results/reports/dns/host_$domain.txt"
+echo -e "- Full DNS recon: results/reports/dns/dnsrecon_$domain.txt"
+echo -e "- WHOIS data: results/reports/dns/whois_$domain.txt"
+
+# Wait for user
+echo -e "\nPress [Enter] to return to main menu..."
+read
