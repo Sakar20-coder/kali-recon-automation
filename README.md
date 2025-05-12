@@ -14,8 +14,6 @@ cd kali-recon-automation
 
 ./recon.sh
 
-nano config/target_list.txt  # Replace 'example.com' with your target
-
 ✨ Features
 Option	       Command	    Output Location
 Quick Scan	 nmap + nikto	results/scans/
